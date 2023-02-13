@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from './Button';
 import InputScreen from './InputScreen';
 
@@ -8,9 +8,18 @@ function CalculatorComponent() {
   
   const operators = ['+', '-', 'x', '÷'];
 
+  // Hooks
   const [screenOperationText, setScreenOperationText] = useState("");
   const [screenResultText, setsScreenResultText] = useState("0");
   
+  useEffect(() => {
+    window.addEventListener('keydown', onKeyPressedHandler)
+
+    return () => {
+      window.removeEventListener("keydown", onKeyPressedHandler);
+    };
+  })
+
   // Functions
   const addScreenDigit = (digit) => {
     let tempOperationText = screenOperationText;
@@ -80,11 +89,43 @@ function CalculatorComponent() {
 
     return result;
   }
+  
+  const onKeyPressedHandler = (event) => {
+    const keyPressed = event.key
+
+    const possibleKeys = {
+      'Delete': cleanMemory,
+      'C': cleanMemory,
+      '(': () => addScreenDigit('('),
+      ')': () => addScreenDigit(')'),
+      '/': () => addScreenDigit(' ÷ '),
+      '7': () => addScreenDigit('7'),
+      '8': () => addScreenDigit('8'),
+      '9': () => addScreenDigit('9'),
+      '*': () => addScreenDigit(' x '),
+      '4': () => addScreenDigit('4'),
+      '5': () => addScreenDigit('5'),
+      '6': () => addScreenDigit('6'),
+      '-': () => addScreenDigit(' - '),
+      '1': () => addScreenDigit('1'),
+      '2': () => addScreenDigit('2'),
+      '3': () => addScreenDigit('3'),
+      '+': () => addScreenDigit(' + '),
+      '.': () => addScreenDigit('.'),
+      '0': () => addScreenDigit('0'),
+      'Backspace': backspace,
+      'Enter': operation,
+      '=': operation,
+    }
+
+    if (possibleKeys[keyPressed])
+      possibleKeys[keyPressed]();
+  }
 
   // View
   return (
     <>
-      <div id={styles.Container}>
+      <div id={styles.Container} >
         <InputScreen operationText={screenOperationText} resultText={screenResultText} />
         <div id={styles.buttonsContainer}>
           <Button label='AC' onClick={cleanMemory} />
